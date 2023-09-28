@@ -12,25 +12,25 @@ public class functions {
         int heroAttack;
         int monsterAttack;
         int monsterHealth = monster.getMaxHealth();
-        int heroHealth = myHero.getHealth();
+     //   int heroHealth = myHero.getHealth();
         int runningAway = 0;
         String answer;
         //   System.out.println(heroHealth);
         //   System.out.println(monsterHealth);
         Item chosenWeapon = function.chooseWeapon(myHero);
 
-        while (heroHealth > 0 && monsterHealth > 0 && runningAway == 0) {
+        while (myHero.getHealth() > 0 && monsterHealth > 0 && runningAway == 0) {
 
-            heroAttack = rand.nextInt(0, chosenWeapon.getAttackValue());//getDamage(chosenWeapon.getAttackValue(), monster.getDefenceValue(),myHero.getLevel());
+            heroAttack = rand.nextInt(0,  ((Weapon) chosenWeapon).getAttackValue());//getDamage(chosenWeapon.getAttackValue(), monster.getDefenceValue(),myHero.getLevel());
             monsterHealth = monsterHealth - heroAttack;
             System.out.println("Du slog monstret för " + heroAttack + ". " + monster.getName() + " har " + monsterHealth + " liv kvar.");
             if (monsterHealth > 0) {
                 monsterAttack = rand.nextInt(0, monster.getAttackValue());//getDamage(monster.getAttackValue(), function.getDefence(myHero, chosenWeapon),monster.getDifficulty());
-                heroHealth -= monsterAttack;
-                System.out.println(monster.getName() + " attackerade dig för " + monsterAttack + ". Du har " + heroHealth + " liv kvar.\n");
+                myHero.setHealth(myHero.getHealth()- monsterAttack);
+                System.out.println(monster.getName() + " attackerade dig för " + monsterAttack + ". Du har " + myHero.getHealth() + " liv kvar.\n");
             }
-            if (monsterHealth > 0 && heroHealth > 0) {
-                System.out.println("Vill du (1) attackera igen eller (2) springa din väg?");
+            if (monsterHealth > 0 && myHero.getHealth() > 0) {
+                System.out.println(((function.checkForInventory(myHero).contains("Helningsdryck")) ? "Vill du (1) attackera igen, (2) springa din väg eller (3) dricka en helningsdryck?": "Vill du (1) attackera igen eller (2) springa din väg?"));
 
                 answer = sc.nextLine();
                 switch (answer.toLowerCase()) {
@@ -41,8 +41,8 @@ public class functions {
                         switch (runAway(myHero, monster)) {
                             case 1 -> {
                                 monsterAttack = rand.nextInt(0, monster.getAttackValue());//getDamage(monster.getAttackValue(), function.getDefence(myHero, chosenWeapon),monster.getDifficulty());
-                                heroHealth -= monsterAttack;
-                                System.out.println(monster.getName() + " attackerade dig för " + monsterAttack + ". Du har " + heroHealth + " liv kvar.\n");
+                                myHero.setHealth(myHero.getHealth()- monsterAttack);
+                                System.out.println(monster.getName() + " attackerade dig för " + monsterAttack + ". Du har " + myHero.getHealth() + " liv kvar.\n");
                                 System.out.println("Du sprang ifrån " + monster.getName());
                                 runningAway = runAway(myHero, monster);
                                 break;
@@ -58,10 +58,14 @@ public class functions {
                             }
                         }
                     }
+                    case "3", "dricka en helningsdryck" ->  {
+                        function.potionDrinking(myHero);
+                        break;
+                    }
                 }
             }
         }
-        myHero.setHealth(heroHealth);
+        //myHero.setHealth(heroHealth);
         if (monsterHealth <= 0) {
             return 0;
         } else if (myHero.getHealth() <= 0) {
@@ -99,13 +103,15 @@ public class functions {
     public Item chooseWeapon(Character myHero) {
         int chosenWeapon;
         System.out.println("Välj vilket vapen du vill använda:");
-        for (Item item : myHero.getInventory()) {
-            System.out.println(myHero.getInventory().indexOf(item) + " " + item.getName() + " - attack " + item.getAttackValue());
+        for (Weapon weapon : myHero.getWeaponsList()) {
+
+                System.out.println(myHero.getWeaponsList().indexOf(weapon) + " " + weapon.getName() + " - attack " + weapon.getAttackValue());
+
         }
         chosenWeapon = sc.nextInt();
         sc.nextLine();
         try {
-            return myHero.getInventory().get(chosenWeapon);
+            return myHero.getWeaponsList().get(chosenWeapon);
         } catch (InputMismatchException e) {
             System.out.println("Fel");
         }
@@ -116,6 +122,7 @@ public class functions {
         ArrayList<String> check = new ArrayList<>();
         for (Item item : myHero.getInventory()) {
             check.add(item.getName());
+         //   System.out.println(item.getName());
         }
         ;
         return check;
@@ -141,13 +148,34 @@ public class functions {
     }
 
     public void potionDrinking(Character myHero){
+        Item currentItem = null;
+        if(checkForInventory(myHero).contains("Helningsdryck")) {
+            System.out.println("Du dricker en flaska med helningsdryck.");
 
-        System.out.println("Du dricker en flaska med helningsdryck.");
-        if(myHero.getHealth() < myHero.getMaxHealth()-20) {
-            myHero.setHealth(myHero.getHealth() + 20);
-        } else {
-            myHero.setHealth(myHero.getMaxHealth());
+            if (myHero.getHealth() <= (myHero.getMaxHealth() - 21)) {
+                myHero.setHealth(myHero.getHealth() + 20);
+            } else {
+                myHero.setHealth(myHero.getMaxHealth());
+            }
+            System.out.println("Du har nu " + myHero.getHealth() + " liv.");
         }
+        for(Item item: myHero.getInventory()) {
+            if(item.getName().equalsIgnoreCase("Helningsdryck")) {
+                currentItem = item;
+                break;
+            }
+        }
+        if(currentItem != null) {
+            myHero.getInventory().remove(currentItem);
+        }
+
+    }
+
+    public void showInventory(Character myHero) {
+        for(Item item : myHero.getInventory()) {
+            System.out.println(item.getName());
+        }
+
 
     }
 

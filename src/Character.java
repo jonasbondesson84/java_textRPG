@@ -8,6 +8,8 @@ public class Character {
     private int level;
     private int xp;
     private ArrayList<Item> inventory = new ArrayList<>();
+    private ArrayList<Weapon> weaponsList = new ArrayList<>();
+    private ArrayList<Misc> miscList = new ArrayList<>();
     private boolean monsterOutSideHouse;
     private int speed;
     private int lastLocation;
@@ -20,7 +22,8 @@ public class Character {
         this.level = 1;
         this.xp = 0;
         this.monsterOutSideHouse = true;
-        this.inventory.add(new Item("Knytnävar", 5, 1));
+        this.weaponsList.add(new Weapon("Knytnävar",5,"Weapon"));
+        this.inventory.add(weaponsList.get(0));
         this.speed = 5;
         lastLocation=100;
     }
@@ -40,6 +43,22 @@ public class Character {
 
     public void setLastLocation(int lastLocation) {
         this.lastLocation = lastLocation;
+    }
+
+    public ArrayList<Weapon> getWeaponsList() {
+        return weaponsList;
+    }
+
+    public void setWeaponsList(ArrayList<Weapon> weaponsList) {
+        this.weaponsList = weaponsList;
+    }
+
+    public ArrayList<Misc> getMiscList() {
+        return miscList;
+    }
+
+    public void setMiscList(ArrayList<Misc> miscList) {
+        this.miscList = miscList;
     }
 
     public int getHealth() {

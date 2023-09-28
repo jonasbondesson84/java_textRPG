@@ -34,22 +34,27 @@ public class Location {
         switch (locationNumber) {
             //--------------------------------------------------------------------
             case 100 -> { //I huset
-                System.out.println("\nDu befinner dig i ett rum. Du ser dig omkring.");
+                System.out.println("\nDu befinner dig i ett rum. Du ser dig omkring. Det är ett litet rum, i rummet finns ett bord och en stol. I ena hörnet finns en eldstad. ");
                 if (!function.checkForInventory(myHero).contains("Svärd")) {//Om man redan har svärdet kan man inte plocka upp det igen.
 
-                    System.out.println("\nDu ser en kista framför dig. Vill du (1) öppna den eller (2) låta den vara?");
+                    System.out.println("Du ser en kista bredvid eldstaden. Vill du (1) öppna den eller (2) låta den vara?");
                     answer = sc.nextLine();
                     switch (answer) {
                         case "1", "öppna den" -> {
                             //Slumpar fram om man kommer få upp svärdet eller möta en spindel
                             if (randomNr.nextBoolean()) {
-                                System.out.println("\nDu har hittat ett svärd. ");
-                                System.out.println("Vill du (1) plocka upp svärdet eller (2) låta det vara?");
+                                System.out.println("\nDu har hittat ett svärd och en flaska. ");
+                                System.out.println("Vill du (1) plocka upp svärdet och flaskan eller (2) låta det vara?");
                                 answer=sc.nextLine();
                                 switch (answer.toLowerCase()) {
-                                    case "1", "plocka upp svärdet" -> {
+                                    case "1", "plocka upp svärdet och flaskan" -> {
                                         System.out.println("Du plockade upp svärdet och la det i din väska.");
-                                        myHero.getInventory().add(new Item("Svärd", 10, 5));
+                                        System.out.println("Flaskan som du hittade innehåller en helningsdryck. Du lägger den i väskan också.");
+                                        myHero.getInventory().add(new Weapon("Svärd",10,  "Weapon"));
+                                        myHero.getWeaponsList().add(new Weapon("Svärd",10,  "Weapon"));
+                                        myHero.getInventory().add(new Misc("Helningsdryck", "potion"));
+                                        myHero.getMiscList().add(new Misc("Helningsdryck", "potion"));
+
                                     }
                                     case "2", "låta det vara" -> {
                                         System.out.println("Du låter svärdet ligga kvar i kistan.");
@@ -91,7 +96,7 @@ public class Location {
                             return 200;
                         }
                         case "2", "stanna kvar" -> {
-                            System.out.println("Du sätter dig ner på en stol en stund...");
+                            System.out.println("Du sätter dig ner på stolen en stund...");
                             System.out.println("...");
                             System.out.println("Du ställer dig upp igen.");
                             return 100;

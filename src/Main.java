@@ -24,8 +24,18 @@ public class Main {
         System.out.println("Skriv in ditt hjältenamn:");
         heroName = sc.nextLine();
         myHero =new Character(heroName);
-        
+//       myHero.getInventory().add(new Misc("Helningsdryck", "potion"));
+//       myHero.getMiscList().add(new Misc("Helningsdryck", "potion"));
+//        function.showInventory(myHero);
+//        myHero.setHealth(50);
+//        System.out.println(myHero.getHealth());
+//        function.potionDrinking(myHero);
+//        System.out.println(myHero.getHealth());
+//        function.showInventory(myHero);
+
         //System.out.println(myHero.getInventory().get(0).getName());
+
+
 
         do {
             currentLocation=world.location(currentLocation, myHero, function, monsterArrayList);
