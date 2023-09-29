@@ -27,6 +27,7 @@ public class Main {
         System.out.println("Skriv in ditt hjältenamn:");
         heroName = sc.nextLine();
         myHero =new Character(heroName);
+      //  myHero.getMiscList().add(Item.magicPotion);
 //       myHero.getInventory().add(new Misc("Helningsdryck", "potion"));
 //       myHero.getMiscList().add(new Misc("Helningsdryck", "potion"));
 //        function.showInventory(myHero);

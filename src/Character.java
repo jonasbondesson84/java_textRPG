@@ -13,6 +13,7 @@ public class Character {
     private boolean monsterOutSideHouse;
     private int speed;
     private int lastLocation;  //Används för att komma ihåg var man var senast, om man springer ifrån ett monster.
+    private boolean triedOpenChest;
 
     //Constructor
     public Character(String name) {
@@ -25,9 +26,18 @@ public class Character {
         this.weaponsList.add(new Weapon("Knytnävar",5,"Weapon"));
         this.inventory.add(weaponsList.get(0));
         this.speed = 5;
-        lastLocation=100;
+        this.lastLocation = 100;
+        this.triedOpenChest = false;
     }
     //Getters and setters
+
+    public boolean isTriedOpenChest() {
+        return triedOpenChest;
+    }
+
+    public void setTriedOpenChest(boolean triedOpenChest) {
+        this.triedOpenChest = triedOpenChest;
+    }
 
     public int getSpeed() {
         return speed;

@@ -68,7 +68,7 @@ public class functions {
         } else if (myHero.getHealth() <= 0) { //Om hjälten har dött
             return 1;
         } else {
-            return 2; //Om man
+            return 2; //Om man springer
         }
     }
 

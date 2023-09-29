@@ -111,7 +111,11 @@ public class Location {
             }
             //--------------------------------------------------------------------
             case 200 -> { //Utanför huset
-                System.out.println("Du står utanför huset. Du befinner dig i en liten by med ett fåtal hus.");
+
+                System.out.println("Du står utanför ditt hus. Du befinner dig i en liten by med ett fåtal hus.");
+                if(myHero.getMiscList().contains(Item.magicPotion)) {
+                    System.out.println("Du ser plötsligt en symbol inristad på dörren. Den ser ut såhär: '⧳'");
+                }
 
                 if (myHero.isMonsterOutSideHouse() || function.randomSpawnMonster(7)) {  //första gången man går utanför dörren kommer det alltid finnas ett monster, annars finns det en mindre möjlighet att det finns ett monster.
                     currentMonster = function.randomMonsterByDifficulty(monsterArrayList, myHero); //slumpar fram ett monster beroende på vilken level man är
@@ -185,20 +189,16 @@ public class Location {
                 }
 
             }
-
-
             //--------------------------------------------------------------------
             case 300 -> { // Skogen
-
-
                 if (myHero.getMiscList().contains(Item.magicPotion)) {  //Har man hittat lyktan kan man gå vidare
-                    System.out.println("\nDet är en mörk skog, men med hjälp av lyktan du har kan du se en liten stig som leder längre in i skogen.");
+                    System.out.println("\nDet är en mörk skog, men med hjälp av den magiska flaskan du har fck av Ragna du se en liten stig som leder längre in i skogen.");
                     System.out.println("Vill du (1) följa stigen eller (2) gå tillbaks?");
                     answer = sc.nextLine();
                     switch (answer.toLowerCase()) {
                         case "1", "följa stigen" -> {
                             myHero.setLastLocation(300);
-                            return 301;
+                            return 310;
                         }
                         case "2", "gå tillbaks" -> {
                             myHero.setLastLocation(300);
@@ -217,14 +217,134 @@ public class Location {
                 }
             }
             //--------------------------------------------------------------------
-            case 301 -> { //stigen man ser om man har lyktan
+            case 310 -> { //stigen man ser om man har lyktan
+                if(function.randomSpawnMonster(7)) {
+                    currentMonster = function.randomMonsterByDifficulty(monsterArrayList, myHero);
+                    System.out.println("\nDu går utmed stigen när plötsligt en " + currentMonster.getName().toLowerCase() + " dyker upp.");
+                    System.out.println("Vill du (1) attackera eller (2) springa tillbaka?");
+                    answer = sc.nextLine();
+                    switch (answer.toLowerCase()) {
+                        case "1", "attackera" -> { //Attackera
+                            attackOutcome = function.encounter(myHero, currentMonster, function);
+                            if (attackOutcome == 0) {
+                                myHero.setLastLocation(310);
+                                return 320;
+                            } else if (attackOutcome == 1) {
+                                return 0;
+                            } else if (attackOutcome == 2) {
+                                return myHero.getLastLocation();
+                            }
+                        }
+                        case "2", "springa" -> { //Springa iväg
+                            switch (function.runAway(myHero, currentMonster)) {
+                                case 0 -> {  //Om monstret är snabbare än du.
+                                    System.out.println(currentMonster.getName() + " hann ikapp dig och attackerar dig.");
+                                    attackOutcome = function.encounter(myHero, currentMonster, function);
+                                    if (attackOutcome == 0) {
+                                        myHero.setLastLocation(310);
+                                        return 320;
+
+                                    } else if (attackOutcome == 1) {
+                                        return 0;
+                                    } else if (attackOutcome == 2) {
+                                        return myHero.getLastLocation();
+                                    }
+                                }
+                                case 1, 2 -> {
+                                    System.out.println("Du lyckades springa ifrån " + currentMonster.getName().toLowerCase() + ". Du sprang tillbaks till den senaste platsen du var på.");
+
+                                    return myHero.getLastLocation();
+                                }
+                            }
+                        }
+                        default -> {
+                            System.out.println("Fel input");
+                            return 310;
+                        }
+                    }
+                } else {
+                    myHero.setLastLocation(310);
+                    System.out.println("Du fortsätter längs med stigen.");
+                    System.out.println("...");
+                    return 320;
+                }
+
+            }
+            //--------------------------------------------------------------------
+            case 320 -> {
+                if(!myHero.isTriedOpenChest()) {
+                    System.out.println("Du kommer fram till en glänta, där det står ett enormt, ihåligt träd. Inne i trädet ser du tre kistor. Ovanför kistorna sitter en skylt.");
+                    System.out.println("Du har hittat de hemliga kistorna. Bara en av de är riktig, de andra är magiska och kommer skada dig om du försöker öppna dem.");
+                    System.out.println("Du har bara en chans på dig att öppna en kista, efter det kommer de försvinna för alltid.");
+                    System.out.println("På locket på varje kista är det inristat tre symboler.");
+                    System.out.println("Kista 1: ⧳ ♈ ⊗");
+                    System.out.println("Kista 2: ⧳ ¥ ⪥");
+                    System.out.println("Kista 3: ⊗ ⪥ ⧳");
+                    System.out.println("Vill du (1) öppna en kista eller (2) vända tillbaka?");
+                    answer = sc.nextLine();
+                    switch (answer.toLowerCase()) {
+                        case "1", "öppna en kista" -> {
+                            System.out.println("Vill du öppna kista (1), kista (2) eller kista (3)");
+                            answer = sc.nextLine();
+                            switch (answer.toLowerCase()) {
+                                case "1", "2" -> {
+                                    System.out.println("Ett stort giftmoln stiger upp från kistan när du försöker öppna den. Du faller avsvimmad ner till marken och förlorar 30 liv.");
+                                    myHero.setHealth(myHero.getHealth()-30);
+                                    if(myHero.getHealth() <= 0) {
+                                        System.out.println("Du överlevde inte giftmolnet.");
+                                        return 0;
+                                    } else {
+                                        System.out.println("Du vaknar upp efter en stund och ser att kistorna är borta. Du går tillbaks längs med stigen.");
+                                        System.out.println("Du har nu " + myHero.getHealth() + " liv kvar.");
+                                        myHero.setTriedOpenChest(true);
+                                        myHero.setLastLocation(310);
+                                        return 300;
+                                    }
+
+                                }
+                                case "3" -> {
+                                    System.out.println("Du öppnade rätt kista!");
+                                    System.out.println("Du hittade en draklans, en helningsflaska och ett par bevingade stövlar som gör dig extra snabb.");
+                                    myHero.getMiscList().add(Item.healthPotion);
+                                    myHero.getInventory().add(Item.healthPotion);
+
+                                    myHero.getMiscList().add(Item.wingedBoots);
+                                    myHero.getInventory().add(Item.wingedBoots);
+                                    myHero.setSpeed(myHero.getSpeed()+5);
+
+                                    myHero.getWeaponsList().add(Item.dragonLance);
+                                    myHero.getInventory().add(Item.dragonLance);
+
+                                    myHero.setTriedOpenChest(true);
+                                    System.out.println("Du går tillbaka längs med stigen.");
+                                    myHero.setLastLocation(310);
+                                    return 300;
+                                }
+                            }
+
+                        }
+                        case "2", "vända tillbaka" -> {
+                            System.out.println("Trots att det verkar väldigt lockande att öppna en kista vänder du om och går tillbaks längs med stigen.");
+                            myHero.setLastLocation(310);
+                            return 300;
+                        }
+                        default -> {
+                            System.out.println("Fel input");
+                            return 320;
+                        }
+                    }
+                } else {
+                    System.out.println("Du ser ett stort ihåligt träd. Det är helt tomt. Du går tillbaka längs med stigen.");
+                    myHero.setLastLocation(310);
+                    return 300;
+                }
 
             }
             //--------------------------------------------------------------------
             case 400 -> { // Vägen
                 System.out.println("Det är en gammal, dammig väg.");
                 if (!myHero.getMiscList().contains(Item.magicPotion)) { //Om man redan har lyktan träffar man inte kvinnan igen
-                    System.out.println("\nVid en stig ser du en gammal kvinna. Hon försöker prata med dig.");
+                    System.out.println("\nVid en stig ser du en gammal kvinna. Hon kommer fram och vill prata med dig.");
                     System.out.println("Vill du (1) prata med kvinnan eller (2) strunta i kvinnan?");
                     answer = sc.nextLine();
                     switch (answer.toLowerCase()) {
@@ -259,11 +379,9 @@ public class Location {
                             return 400;
                         }
                     }
-
                 }
                 System.out.println("Du går vidare längs vägen.");
                 return 410;
-
             }
             //--------------------------------------------------------------------
             case 410 -> { //vägskälet
@@ -273,7 +391,8 @@ public class Location {
                 answer = sc.nextLine();;
                 switch (answer.toLowerCase()) {
                     case "1", "mot staden" -> {
-                        System.out.println("Du går mot staden. Efter en stund kommer du fram till ytterligare ett vägskäl, men där vägen till höger är blockerad av stora stenar. Du väljer då att gå åt vänster.");
+                        System.out.println("Du går mot staden. Efter en stund kommer du fram till ytterligare ett vägskäl, men där vägen till höger är blockerad av stora stenar. På ett träd ser du att någon har ristat in följande tecken: '⪥'");
+                        System.out.println("Du väljer att fortsätta gå åt vänster.");
                         myHero.setLastLocation(410);
                         return 420;
                     }
@@ -293,7 +412,6 @@ public class Location {
                         return 410;
                     }
                 }
-
             }
             //--------------------------------------------------------------------
             case 4101 -> { //vattenfallet
@@ -326,8 +444,6 @@ public class Location {
                         return 420;
                     }
                 }
-
-
             }
             //--------------------------------------------------------------------
             case 421 -> { //Möter rövare.
@@ -356,8 +472,6 @@ public class Location {
                 } else if (attackOutcome == 2) {
                     return myHero.getLastLocation();
                 }
-
-
             }
             //--------------------------------------------------------------------
             case 430 -> { //kvinnans hus
@@ -374,6 +488,7 @@ public class Location {
                 switch (answer.toLowerCase()) {
                     case "1", "stanna kvar i huset" -> {
                         System.out.println("Du stannar kvar på middag men sedan lämnar du kvinnan ifred och går tillbaks på vägen.");
+                        System.out.println("När du är på väg att gå ser du något inristat på en dörrpost. Det ser ut såhär: '⊗'");
                         System.out.println("...");
                         return 400;
                     }

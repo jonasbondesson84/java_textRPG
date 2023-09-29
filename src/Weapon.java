@@ -11,7 +11,6 @@ public class Weapon implements Item {
     public Weapon(String name, int attackValue, String type) {
         this.name = name;
         this.attackValue = attackValue;
-        // this.defenceValue = defenceValue;
         this.type = type;
     }
 
