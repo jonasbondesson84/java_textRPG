@@ -12,47 +12,44 @@ public class functions {
         int heroAttack;
         int monsterAttack;
         int monsterHealth = monster.getMaxHealth();
-     //   int heroHealth = myHero.getHealth();
         int runningAway = 0;
         String answer;
-        //   System.out.println(heroHealth);
-        //   System.out.println(monsterHealth);
-        Item chosenWeapon = function.chooseWeapon(myHero);
+        Weapon chosenWeapon = function.chooseWeapon(myHero);
 
-        while (myHero.getHealth() > 0 && monsterHealth > 0 && runningAway == 0) {
+        while (myHero.getHealth() > 0 && monsterHealth > 0 && runningAway == 0) {  //Håller på tills antingen hjältens hp=0, monster hp=0 eller man väljer att springa iväg.
 
-            heroAttack = rand.nextInt(0,  ((Weapon) chosenWeapon).getAttackValue());//getDamage(chosenWeapon.getAttackValue(), monster.getDefenceValue(),myHero.getLevel());
-            monsterHealth = monsterHealth - heroAttack;
+            heroAttack = (rand.nextInt(0,   chosenWeapon.getAttackValue()) + myHero.getLevel()*2); //Slumpar fram ett attackvärde för den här rundan. Ju högre level man är och ju bättre vapen man har, desto mer skada gör man
+            monsterHealth = monsterHealth - heroAttack;  //Minskar monstrets hp med attckvärdet.
             System.out.println("Du slog monstret för " + heroAttack + ". " + monster.getName() + " har " + monsterHealth + " liv kvar.");
-            if (monsterHealth > 0) {
-                monsterAttack = rand.nextInt(0, monster.getAttackValue());//getDamage(monster.getAttackValue(), function.getDefence(myHero, chosenWeapon),monster.getDifficulty());
+
+            if (monsterHealth > 0) { //Om monstret fortfarande har liv kvar attackerar den tillbaks.
+                monsterAttack = rand.nextInt(0, monster.getAttackValue());
                 myHero.setHealth(myHero.getHealth()- monsterAttack);
                 System.out.println(monster.getName() + " attackerade dig för " + monsterAttack + ". Du har " + myHero.getHealth() + " liv kvar.\n");
             }
-            if (monsterHealth > 0 && myHero.getHealth() > 0) {
-                System.out.println(((function.checkForInventory(myHero).contains("Helningsdryck")) ? "Vill du (1) attackera igen, (2) springa din väg eller (3) dricka en helningsdryck?": "Vill du (1) attackera igen eller (2) springa din väg?"));
-
+            if (monsterHealth > 0 && myHero.getHealth() > 0) { //Om någon har liv kvar så får man frågan om att fortsätta
+                System.out.println(((function.checkForInventory(myHero).contains("Helningsdryck")) ? "Vill du (1) attackera igen, (2) springa din väg eller (3) dricka en helningsdryck och sedan attackera igen?": "Vill du (1) attackera igen eller (2) springa din väg?"));
                 answer = sc.nextLine();
                 switch (answer.toLowerCase()) {
                     case "1", "attackera igen" -> {
                         break;
                     }
-                    case "2", "springa din väg" -> {
+                    case "2", "springa din väg" -> { //OBS! denna är egen för om man springer ifrån under en strid.
                         switch (runAway(myHero, monster)) {
-                            case 1 -> {
-                                monsterAttack = rand.nextInt(0, monster.getAttackValue());//getDamage(monster.getAttackValue(), function.getDefence(myHero, chosenWeapon),monster.getDifficulty());
+                            case 1 -> {  //Om monstret är lika snabbt som hjälten
+                                monsterAttack = rand.nextInt(0, monster.getAttackValue());
                                 myHero.setHealth(myHero.getHealth()- monsterAttack);
                                 System.out.println(monster.getName() + " attackerade dig för " + monsterAttack + ". Du har " + myHero.getHealth() + " liv kvar.\n");
                                 System.out.println("Du sprang ifrån " + monster.getName());
                                 runningAway = runAway(myHero, monster);
                                 break;
                             }
-                            case 2 -> {
+                            case 2 -> { //Om hjälten är snabbare än monstret
                                 System.out.println("Du sprang ifrån " + monster.getName());
                                 runningAway = runAway(myHero, monster);
                                 break;
                             }
-                            default -> {
+                            default -> { //Om monstret är snabbare än hjälten
                                 System.out.println(monster.getName() + " var för snabb! Du måste slåss.");
                                 break;
                             }
@@ -65,20 +62,22 @@ public class functions {
                 }
             }
         }
-        //myHero.setHealth(heroHealth);
-        if (monsterHealth <= 0) {
+
+        if (monsterHealth <= 0) { //Om monstret har dött
             return 0;
-        } else if (myHero.getHealth() <= 0) {
+        } else if (myHero.getHealth() <= 0) { //Om hjälten har dött
             return 1;
         } else {
-            return 2;
+            return 2; //Om man
         }
     }
 
     public int encounter(Character myHero, Monster monster, functions function) {
-        int encounterOutcome = function.attack(myHero, monster, function);
+        int encounterOutcome = function.attack(myHero, monster, function);  //Kollar vad som händer i varje attack (vad den returnerar)
         if (encounterOutcome == 0) {
             System.out.println("Du dödade " + monster.getName() + ".\n");
+            myHero.setXp(myHero.getXp()+ monster.getXpGiven());
+            function.checkIfLevelUp(myHero);
             return 0;
         } else if (encounterOutcome == 1) {
             System.out.println(monster.getName() + " dödade dig.\n");
@@ -88,25 +87,22 @@ public class functions {
         }
     }
 
-    public Monster randomMonsterByDifficulty(ArrayList<Monster> monsterArrayList, Character myHero) {
+    public Monster randomMonsterByDifficulty(ArrayList<Monster> monsterArrayList, Character myHero) {  //slumpar fram ett monster beroende på vilken level man är.
         ArrayList<Monster> monsterListByLevel = new ArrayList<>();
         int randomNr;
-
-        for (Monster monster : monsterArrayList) {
+        for (Monster monster : monsterArrayList) { //Hämtar alla monster som är på samma nivå som en själv och lägre.
             if (monster.getDifficulty() <= myHero.getLevel())
                 monsterListByLevel.add(monster);
         }
-        randomNr = (int) (Math.random() * monsterListByLevel.size());
+        randomNr = (int) (Math.random() * monsterListByLevel.size()); //Slumpar fram vilket monster det blir.
         return monsterArrayList.get(randomNr);
     }
 
-    public Item chooseWeapon(Character myHero) {
+    public Weapon chooseWeapon(Character myHero) {
         int chosenWeapon;
         System.out.println("Välj vilket vapen du vill använda:");
-        for (Weapon weapon : myHero.getWeaponsList()) {
-
+        for (Weapon weapon : myHero.getWeaponsList()) { //Listar alla vapen man har med sig.
                 System.out.println(myHero.getWeaponsList().indexOf(weapon) + " " + weapon.getName() + " - attack " + weapon.getAttackValue());
-
         }
         chosenWeapon = sc.nextInt();
         sc.nextLine();
@@ -115,16 +111,14 @@ public class functions {
         } catch (InputMismatchException e) {
             System.out.println("Fel");
         }
-        return myHero.getInventory().get(0);
+        return myHero.getWeaponsList().get(0);
     }
 
-    ArrayList<String> checkForInventory(Character myHero) {
+    public ArrayList<String> checkForInventory(Character myHero) {
         ArrayList<String> check = new ArrayList<>();
         for (Item item : myHero.getInventory()) {
             check.add(item.getName());
-         //   System.out.println(item.getName());
         }
-        ;
         return check;
     }
 
@@ -149,7 +143,8 @@ public class functions {
 
     public void potionDrinking(Character myHero){
         Item currentItem = null;
-        if(checkForInventory(myHero).contains("Helningsdryck")) {
+        Misc currentItemMisc = null;
+        if(myHero.getInventory().contains(Item.healthPotion)) {
             System.out.println("Du dricker en flaska med helningsdryck.");
 
             if (myHero.getHealth() <= (myHero.getMaxHealth() - 21)) {
@@ -159,7 +154,7 @@ public class functions {
             }
             System.out.println("Du har nu " + myHero.getHealth() + " liv.");
         }
-        for(Item item: myHero.getInventory()) {
+        for(Item item: myHero.getInventory()) { //Tar bort helningsdrycken från Inventory
             if(item.getName().equalsIgnoreCase("Helningsdryck")) {
                 currentItem = item;
                 break;
@@ -168,7 +163,15 @@ public class functions {
         if(currentItem != null) {
             myHero.getInventory().remove(currentItem);
         }
-
+        for(Misc item: myHero.getMiscList()) { //Tar bort helningsdrycken från Misc
+            if(item.getName().equalsIgnoreCase("Helningsdryck")) {
+                currentItemMisc = item;
+                break;
+            }
+        }
+        if(currentItemMisc != null) {
+            myHero.getMiscList().remove(currentItemMisc);
+        }
     }
 
     public void showInventory(Character myHero) {
@@ -179,16 +182,13 @@ public class functions {
 
     }
 
-//    public int getDamage(int attackValue, int defenceValue, int lvl) {
-//        int dmg;
-//        Random theRandom = new Random();
-//        double randomDmg = 0.20 + (1.10 - 0.20) * theRandom.nextDouble();
-//        dmg = (int) Math.ceil(((randomDmg * (attackValue - (0.5 * defenceValue)))) + 0.2 * lvl);
-//        //System.out.println(dmg);
-//        return dmg;
-//    }
-//
-//    public int getDefence(Character myHero, Item chosenWeapon) {
-//        return (myHero.getLevel() + chosenWeapon.getDefenceValue());
-//    }
+    public void checkIfLevelUp(Character myHero) {
+        if(myHero.getXp() > (myHero.getLevel() * 120)) {
+            myHero.setLevel((myHero.getLevel() + 1));
+            System.out.println("Du känner dig starkare! Du har gått upp i nivå.");
+            System.out.println("Du är nu på nivå " + myHero.getLevel());
+        }
+
+    }
+
 }

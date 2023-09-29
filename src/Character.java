@@ -12,7 +12,7 @@ public class Character {
     private ArrayList<Misc> miscList = new ArrayList<>();
     private boolean monsterOutSideHouse;
     private int speed;
-    private int lastLocation;
+    private int lastLocation;  //Används för att komma ihåg var man var senast, om man springer ifrån ett monster.
 
     //Constructor
     public Character(String name) {

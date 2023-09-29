@@ -1,4 +1,7 @@
 public interface Item {
+    Weapon sword = new Weapon("Svärd", 10, "weapon");
+    Misc healthPotion = new Misc("Helningsdryck", "potion");
+    Misc lantern = new Misc("Lykta", "misc");
 
     public String getName();
 
