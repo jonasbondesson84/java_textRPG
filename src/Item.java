@@ -1,7 +1,10 @@
 public interface Item {
     Weapon sword = new Weapon("Svärd", 10, "weapon");
+    Weapon battleAxe = new Weapon("Stridsyxa", 15, "weapon");
     Misc healthPotion = new Misc("Helningsdryck", "potion");
-    Misc lantern = new Misc("Lykta", "misc");
+    Misc magicPotion = new Misc("Lykta", "potion");
+    Misc rope = new Misc("Rep", "misc");
+
 
     public String getName();
 

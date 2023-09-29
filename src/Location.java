@@ -191,7 +191,7 @@ public class Location {
             case 300 -> { // Skogen
 
 
-                if (function.checkForInventory(myHero).contains("Lykta")) {  //Har man hittat lyktan kan man gå vidare
+                if (myHero.getMiscList().contains(Item.magicPotion)) {  //Har man hittat lyktan kan man gå vidare
                     System.out.println("\nDet är en mörk skog, men med hjälp av lyktan du har kan du se en liten stig som leder längre in i skogen.");
                     System.out.println("Vill du (1) följa stigen eller (2) gå tillbaks?");
                     answer = sc.nextLine();
@@ -222,9 +222,9 @@ public class Location {
             }
             //--------------------------------------------------------------------
             case 400 -> { // Vägen
-                System.out.println("Det är en gammal, dammig väg. Du vandrar vidare längs med vägen.");
-                if (!function.checkForInventory(myHero).contains("Lykta")) { //Om man redan har lyktan träffar man inte kvinnan igen
-                    System.out.println("\nDu träffar en gammal kvinna. Hon försöker prata med dig.");
+                System.out.println("Det är en gammal, dammig väg.");
+                if (!myHero.getMiscList().contains(Item.magicPotion)) { //Om man redan har lyktan träffar man inte kvinnan igen
+                    System.out.println("\nVid en stig ser du en gammal kvinna. Hon försöker prata med dig.");
                     System.out.println("Vill du (1) prata med kvinnan eller (2) strunta i kvinnan?");
                     answer = sc.nextLine();
                     switch (answer.toLowerCase()) {
@@ -261,11 +261,13 @@ public class Location {
                     }
 
                 }
+                System.out.println("Du går vidare längs vägen.");
+                return 410;
 
             }
             //--------------------------------------------------------------------
             case 410 -> { //vägskälet
-                System.out.println("Du går ...");
+                System.out.println("...");
                 System.out.println("Du kommer fram till ett vägskäl. Det finns en skylt pekar åt tre håll: (1) Staden, (2) Vattenfallet, (3) Byn");
                 System.out.println("Vill du gå (1) mot staden, (2) mot vattenfallet eller (3) mot byn?");
                 answer = sc.nextLine();;
@@ -278,7 +280,7 @@ public class Location {
                     case "2", "mot vattenfallet" -> {
                         System.out.println("Du går mot vattenfallet.");
                         myHero.setLastLocation(410);
-                        return 411;
+                        return 4101;
 
                     }
                     case "3", "mot byn" -> {
@@ -294,11 +296,97 @@ public class Location {
 
             }
             //--------------------------------------------------------------------
-            case 411 -> { //vattenfallet
+            case 4101 -> { //vattenfallet
 
             }
             //--------------------------------------------------------------------
-            case 420 -> { //mot staden
+            case 411 -> { //mot staden
+
+            }
+            //--------------------------------------------------------------------
+            case 420 -> { //Följa med kvinnan
+                System.out.println("Kvinnan berättar att hon heter Ragna och bor i en ny långt upp i norr. Hon berättar också att hon ofta brukar vara ute och vandra själv.");
+                System.out.println("\nPlötsligt hör du något från en skogsdunge i närheten.");
+                System.out.println("Vill du (1) undersöka skogsdungen eller (2) fortsätta gå?");
+                answer = sc.nextLine();
+                switch (answer.toLowerCase()) {
+                    case "1", "undersöka skogsdungen" -> {
+                        System.out.println("Du ber Ragna stanna kvar på vägen medan du undersöker skogsdungen.");
+                        myHero.setLastLocation(420);
+                        return 421;
+                    }
+                    case "2", "fortsätta gå" -> {
+                        System.out.println("Du struntar i ljudet och ni fortsätter gå på vägen.");
+                        myHero.setLastLocation(420);
+                        return 430;
+
+                    }
+                    default -> {
+                        System.out.println("Fel input");
+                        return 420;
+                    }
+                }
+
+
+            }
+            //--------------------------------------------------------------------
+            case 421 -> { //Möter rövare.
+                currentMonster = new Monster("Rövare", 40, 7,5,2,25, 200);
+                System.out.println("\nNär du kommer in i skogsdungen kommer det tre rövare springande mot dig. Du hinner inte springa undan!");
+                attackOutcome = function.encounter(myHero, currentMonster, function);
+                if (attackOutcome == 0) {
+                    System.out.println("Du lyckas döda alla rövarna. Bland deras tillhörigheter hittar du en stridsyxa samt ett rep.");
+                    System.out.println("Vill du (1) plocka upp deras tillhörigheter eller (2) låta de vara?");
+                    answer = sc.nextLine();
+                    switch (answer.toLowerCase()) {
+                        case "1", "plocka upp deras tillhörigheter" -> {
+                            System.out.println("Du plockar upp stridsyxan och repet.");
+                            myHero.getInventory().add(Item.battleAxe);
+                            myHero.getInventory().add(Item.rope);
+                            myHero.getWeaponsList().add(Item.battleAxe);
+                            myHero.getMiscList().add(Item.rope);
+                        }
+                        case "2", "låta de vara" -> {
+                            System.out.println("Du låter rövarnas saker vara.");
+                        }
+                    }
+                    return 430;
+                } else if (attackOutcome == 1) {
+                    return 0;
+                } else if (attackOutcome == 2) {
+                    return myHero.getLastLocation();
+                }
+
+
+            }
+            //--------------------------------------------------------------------
+            case 430 -> { //kvinnans hus
+                System.out.println("\nNi kommer fram till Ragnas släktingar. Ragna är väldigt glad för att du har hjälp henna på vägen. Hon plockar upp något ur sin väska som hon ger till dig.");
+                System.out.println("'Tack " + myHero.getName() + "! Som tack för din hjälp ska du få något som kan hjälpa dig på dina vandringar.'");
+                System.out.println("'Det är en magisk flaska. När mörkret är som störst kommer den ge dig ljus.'");
+                System.out.println("Du tar emot flaskan och stoppar den i din väska.");
+                if(!myHero.getMiscList().contains(Item.magicPotion)) {
+                    myHero.getInventory().add(Item.magicPotion);
+                    myHero.getMiscList().add(Item.magicPotion);
+                }
+                System.out.println("\nVill du (1) stanna kvar i huset eller (2) gå tillbaks på vägen?");
+                answer = sc.nextLine();
+                switch (answer.toLowerCase()) {
+                    case "1", "stanna kvar i huset" -> {
+                        System.out.println("Du stannar kvar på middag men sedan lämnar du kvinnan ifred och går tillbaks på vägen.");
+                        System.out.println("...");
+                        return 400;
+                    }
+                    case "2", "gå tillbaks på vägen" -> {
+                        System.out.println("Du tackar kvinnan och går sedan tillbaks längs vägen.");
+                        System.out.println("...");
+                        return 400;
+                    }
+                    default -> {
+                        System.out.println("Fel input");
+                        return 430;
+                    }
+                }
 
             }
         }

@@ -28,7 +28,7 @@ public class functions {
                 System.out.println(monster.getName() + " attackerade dig för " + monsterAttack + ". Du har " + myHero.getHealth() + " liv kvar.\n");
             }
             if (monsterHealth > 0 && myHero.getHealth() > 0) { //Om någon har liv kvar så får man frågan om att fortsätta
-                System.out.println(((function.checkForInventory(myHero).contains("Helningsdryck")) ? "Vill du (1) attackera igen, (2) springa din väg eller (3) dricka en helningsdryck och sedan attackera igen?": "Vill du (1) attackera igen eller (2) springa din väg?"));
+                System.out.println(((myHero.getMiscList().contains(Item.healthPotion)) ? "Vill du (1) attackera igen, (2) springa din väg eller (3) dricka en helningsdryck och sedan attackera igen?": "Vill du (1) attackera igen eller (2) springa din väg?"));
                 answer = sc.nextLine();
                 switch (answer.toLowerCase()) {
                     case "1", "attackera igen" -> {
@@ -114,13 +114,13 @@ public class functions {
         return myHero.getWeaponsList().get(0);
     }
 
-    public ArrayList<String> checkForInventory(Character myHero) {
-        ArrayList<String> check = new ArrayList<>();
-        for (Item item : myHero.getInventory()) {
-            check.add(item.getName());
-        }
-        return check;
-    }
+//    public ArrayList<String> checkForInventory(Character myHero) {
+//        ArrayList<String> check = new ArrayList<>();
+//        for (Item item : myHero.getInventory()) {
+//            check.add(item.getName());
+//        }
+//        return check;
+//    }
 
     public boolean randomSpawnMonster(int spawnRate) {
 
@@ -185,6 +185,7 @@ public class functions {
     public void checkIfLevelUp(Character myHero) {
         if(myHero.getXp() > (myHero.getLevel() * 120)) {
             myHero.setLevel((myHero.getLevel() + 1));
+            myHero.setSpeed(myHero.getSpeed() + 3);
             System.out.println("Du känner dig starkare! Du har gått upp i nivå.");
             System.out.println("Du är nu på nivå " + myHero.getLevel());
         }
